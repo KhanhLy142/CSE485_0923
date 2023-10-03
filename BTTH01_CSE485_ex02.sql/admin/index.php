@@ -1,3 +1,41 @@
+<?php
+    //Dich vu Bao ve
+    session_start();
+
+    //Kiem tra thong tin để bảo vệ kiểm soát ra vào
+    if(!isset($_SESSION['Login'])){
+        header("Location:../login.php");
+    }
+?>
+<?php
+    try {
+        $conn = new PDO('mysql:host=localhost;dbname=btth01_cse485', 'root', '');
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Truy vấn để đếm số lượng người dùng
+        $stmt_users = $conn->prepare("SELECT COUNT(*) FROM nguoidung");
+        $stmt_users->execute();
+        $user_count = $stmt_users->fetchColumn();
+
+        // Truy vấn để đếm số lượng thể loại
+        $stmt_categories = $conn->prepare("SELECT COUNT(*) FROM theloai");
+        $stmt_categories->execute();
+        $category_count = $stmt_categories->fetchColumn();
+
+        // Truy vấn để đếm số lượng tác giả
+        $stmt_authors = $conn->prepare("SELECT COUNT(*) FROM tacgia");
+        $stmt_authors->execute();
+        $author_count = $stmt_authors->fetchColumn();
+
+        // Truy vấn để đếm số lượng bài viết
+        $stmt_posts = $conn->prepare("SELECT COUNT(*) FROM baiviet");
+        $stmt_posts->execute();
+        $post_count = $stmt_posts->fetchColumn();
+
+    } catch (PDOException $e) {
+        echo "Kết nối thất bại: " . $e->getMessage();
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,25 +95,25 @@ p{
     <div class="col-md-3">
       <div class="card">
         <p>Người dùng </p>
-        <h1>110</h1>
+        <h1><?= $user_count ?></h1>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card">
         <p>Thể loại </p>
-        <h1>10</h1>
+        <h1><?= $category_count ?></h1>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card">
         <p>Tác giả </p>
-        <h1>20</h1>
+        <h1><?= $author_count ?></h1>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card">
         <p>Bài viết </p>
-        <h1>110</h1>
+        <h1><?= $post_count ?></h1>
       </div>
     </div>
   </div>

@@ -1,3 +1,44 @@
+<?php
+if(isset($_POST['Login'])){
+    $user = $_POST['FullName'];
+    $pass = $_POST['Password'];
+
+    //Truy van thong tin:
+    try{
+        //Buoc 1: Ket noi DBServer
+        $conn = new PDO("mysql:host=localhost;dbname=btth01_cse485", "root", "");
+        //Buoc 2: Thuc hien truy van
+        $sql_check = "SELECT * FROM nguoidung WHERE Fullname = '$user' OR Email = '$user'";
+        $stmt = $conn->prepare($sql_check);
+        $stmt->execute();
+        //Buoc 3: Lay ra thong tin bao gom MAT KHAU
+
+        if (!$stmt) {
+            echo "Lỗi truy vấn: " . $conn->errorInfo()[2];
+        } else{
+            if($stmt->rowCount() > 0){
+                $users = $stmt->fetch();
+                //Lay ra mat khau
+                $pass_hash = $users[3];
+                if(password_verify($pass,$pass_hash)){
+                    //CAP THE (authentication - Not: authorization)
+                    session_start();
+                    $_SESSION['Login'] = $users[1];
+                    header("Location:BTTH01B/index.php");
+                }else{
+                    header("Location:login.php?error=not-matched-password");
+                }
+            }else{
+                header("Location:login.php?error=not-existed");
+            }
+        }
+
+
+    }catch(PDOException $e){
+        echo $e->getMessage();
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,8 +120,13 @@
       </form>
   </div>
 </nav>
+<?php
+    if(isset($_GET['error'])){
+        echo "<p>{$_GET['error']}</p>";
+    }
+?>
 <div class="login-container">
-    <h3 style="color:#f8f9fa;">Sign In</h3><br/>
+    <h3 style="color:#f8f9fa;">Sign Up</h3><br/>
     <form>
     <div class="input-group flex-nowrap">
         <span class="input-group-text" id="addon-wrapping"><i class="bi bi-person-fill" style= "font-size:25px;" ></i></span>

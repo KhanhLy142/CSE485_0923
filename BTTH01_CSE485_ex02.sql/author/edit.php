@@ -1,55 +1,3 @@
-<?php
-    //Dich vu Bao ve
-    session_start();
-
-    //Kiem tra thong tin để bảo vệ kiểm soát ra vào
-    if(!isset($_SESSION['Login'])){
-        header("Location:../../login.php");
-    }
-?>
-<?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Lấy và kiểm tra dữ liệu từ biểu mẫu
-    $ma_tloai = $_POST["ma_tloai"];
-    $ten_tloai = $_POST["ten_tloai"];
-
-    // Cập nhật thông tin thể loại trong cơ sở dữ liệu sử dụng SQL
-    try {
-        $conn = new PDO('mysql:host=localhost;dbname=btth01_cse485', 'root', '');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $sql = "UPDATE theloai SET ten_tloai = :ten_tloai WHERE ma_tloai = :ma_tloai";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":ten_tloai", $ten_tloai, PDO::PARAM_STR);
-        $stmt->bindParam(":ma_tloai", $ma_tloai, PDO::PARAM_INT);
-        $stmt->execute();
-
-        // Chuyển hướng trở lại index.php sau khi cập nhật
-        header("Location: category.php");
-        exit();
-    } catch (PDOException $e) {
-        echo "Kết nối thất bại: " . $e->getMessage();
-    }
-} else {
-    // Hiển thị biểu mẫu để chỉnh sửa thông tin thể loại
-    // Lấy thông tin thể loại sử dụng $_GET["id"] và điền vào các trường của biểu mẫu
-    $ma_tloai = $_GET["id"];
-
-    try {
-        $conn = new PDO('mysql:host=localhost;dbname=btth01_cse485', 'root', '');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $sql = "SELECT * FROM theloai WHERE ma_tloai = :ma_tloai";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":ma_tloai", $ma_tloai, PDO::PARAM_INT);
-        $stmt->execute();
-
-        $theloai = $stmt->fetch();
-    } catch (PDOException $e) {
-        echo "Kết nối thất bại: " . $e->getMessage();
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,10 +45,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <a class="nav-link" href="#">Trang ngoài</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Thể loại</a>
+          <a class="nav-link" href="#">Thể loại</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Tác giả</a>
+          <a class="nav-link  active" aria-current="page" href="#">Tác giả</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Bài viết</a>
@@ -110,14 +58,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </div>
 </nav>
 <div class="container">
-<b><h3>SỬA THÔNG TIN THỂ LOẠI</h3></b>
+<b><h3>SỬA THÔNG TIN TÁC GIẢ</h3></b>
 <div class="input-group mb-3">
-  <span class="input-group-text" id="inputGroup-sizing-default">Mã thể loại</span>
+  <span class="input-group-text" id="inputGroup-sizing-default">Mã tác giả</span>
   <input type="text" class="form-control" aria-label="Text input with checkbox">
 </div>
-
 <div class="input-group">
-  <span class="input-group-text" id="inputGroup-sizing-default">Tên thể loại</span>
+  <span class="input-group-text" id="inputGroup-sizing-default">Tên tác giả</span>
   <input type="text" class="form-control" aria-label="Text input with radio button">
 </div>
 <div class="button">

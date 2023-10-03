@@ -1,3 +1,17 @@
+<?php 
+    try {
+        $conn = new PDO('mysql:host=localhost;dbname=btth01_cse485', 'root', '');
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "SELECT * FROM baiviet ORDER BY ma_bviet desc limit 8";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $data = $stmt->fetchAll();
+    } catch(PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,19 +22,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 </head>
 <style>
-        .card-text{
-            color:blue;
-            text-align: center;
-        }
-          .card-footer{
-            margin-top:10px;
-            background-color: #f8f9fa;
-            padding: 20px;
-            text-align: center;
-            color:black;
-            font-weight: bold;
-            border-top: 1px solid black;
-        }
+  nav{
+    box-shadow: 0px 10px 6px -6px #999999;
+  }
+  .card-text{
+    color:blue;
+    text-align: center;
+  }
+  .card-footer{
+    margin-top:10px;
+    padding: 20px;
+    text-align: center;
+    color:black;
+    font-weight: bold;
+    border-top: 1px solid black;
+    }
 </style>
 <body>
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -64,47 +80,18 @@
 </div>
 <center><h3 style = " color:blue;">TOP BÀI HÁT YÊU THÍCH </h3></center><br/>
 <div class="row row-cols-1 row-cols-md-4 g-4">
-  <div class="col">
-    <div class="card">
-      <img src="images/songs/cayvagio.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Cây, lá và gió</p>
-      </div>
+        <?php 
+            foreach($data as $value): ?>
+                <div class="col">
+                <div class="card">
+                    <img src= "<?= $value['hinhanh'];?>" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href = "detail.php?ma_bviet=<?= $value['ma_bviet'];?>" style ="text-decoration:none;"><?= $value['ten_bhat']?></a></h5>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
-  </div>
-  <div class="col">
-    <div class="card">
-      <img src="images/songs/csmt.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Cuộc sống mến thương</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card">
-      <img src="images/songs/longme.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Lòng mẹ</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card">
-      <img src="images/songs/phoipha.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Phôi pha</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card">
-      <img src="images/songs/noitinhyeubatdau.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Nơi tình yêu bắt</p>
-      </div>
-    </div>
-  </div>
-</div>
 <div class="card-footer">
     TLU'S MUSIC GARDEN
   </div>

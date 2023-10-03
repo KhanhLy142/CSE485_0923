@@ -1,3 +1,43 @@
+
+<?php 
+    try {
+        $conn = new PDO('mysql:host=localhost;dbname=btth01_cse485', 'root', '');
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "SELECT * FROM baiviet ORDER BY ma_bviet";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+
+        $data = $stmt->fetchAll();
+    } catch(PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
+    }
+    // Lấy thông tin nhận dạng từ URL
+    $id = isset($_GET['ma_bviet']) ? $_GET['ma_bviet'] : 0;
+
+    // Truy vấn cơ sở dữ liệu để lấy dữ liệu tương ứng
+    $sql = "SELECT * FROM baiviet WHERE ma_bviet = :ma_bviet";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':ma_bviet', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    // Lấy dữ liệu
+    $baiHat = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Thực hiện truy vấn để lấy tên tác giả
+    $sqlTacGia = "SELECT ten_tgia FROM tacgia WHERE ma_tgia = :ma_tgia";
+    $stmtTacGia = $conn->prepare($sqlTacGia);
+    $stmtTacGia->bindParam(':ma_tgia', $baiHat['ma_tgia'], PDO::PARAM_INT);
+    $stmtTacGia->execute();
+    $tenTacGia = $stmtTacGia->fetch(PDO::FETCH_ASSOC);
+
+    // Thực hiện truy vấn để lấy tên thể loại
+    $sqlTheLoai = "SELECT ten_tloai FROM theloai WHERE ma_tloai = :ma_tloai";
+    $stmtTheLoai = $conn->prepare($sqlTheLoai);
+    $stmtTheLoai->bindParam(':ma_tloai', $baiHat['ma_tloai'], PDO::PARAM_INT);
+    $stmtTheLoai->execute();
+    $tenTheLoai = $stmtTheLoai->fetch(PDO::FETCH_ASSOC);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,9 +48,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 </head>
 <style>
+  nav{
+    box-shadow: 0px 10px 6px -6px #999999;
+  }
           .card-footer{
             margin-top:10px;
-            background-color: #f8f9fa;
             padding: 20px;
             text-align: center;
             color:black;
@@ -37,23 +79,30 @@
   </div>
 </nav>
 <br/>
-<div class="card mb-3" style="max-width: 100%; border:0px;">
-  <div class="row g-0">
-    <div class="col-md-4">
-      <img src="images/songs/cayvagio.jpg" class="img-fluid" alt="...">
+<div class="card mb-3 m-5" style="max-width: 100%; border:0;">
+        <div class="row g-0">
+            <div class="col-md-4">
+            <img src= "<?= $baiHat['hinhanh'];?>" class="img-fluid" alt="...">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                <?php
+                // Hiển thị thông tin của bài hát
+                    if ($baiHat) {?>
+                        <h5><?= $baiHat['tieude']?></h5>
+                        <p><b>Bài hát: </b><?= $baiHat['ten_bhat']?></p>
+                        <p><b>Thể loại: </b><?= $tenTheLoai['ten_tloai']?></p>
+                        <p><b>Tóm tắt: </b><?=$baiHat['tomtat']?></p>
+                        <p><b>Nội dung: </b><?=$baiHat['noidung']?></p>
+                        <p><b>Tác giả: </b><?=$tenTacGia['ten_tgia']?></p>
+                    <?php } else {
+                        echo "Không tìm thấy bài hát.";
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-8">
-      <div class="card-body">
-        <h5 class="card-title" style = " color:blue;">Cây và gió</h5> 
-        <p><b>Bài hát: </b> Cây và gió</p>
-        <p><b>Thể loại: </b> Nhạc trữ tình</p>
-        <p><b>Tóm tắt: </b> Em và anh, hai đứa quen nhau thật tình cờ. Lời hát của anh từ bài hát "Cây và gió" đã làm tâm hồn em xao động. Nhưng sự thật phũ phàng rằng em chưa bao giờ nói cho anh biết những suy nghĩ tận sâu trong tim mình. Bởi vì em nhút nhát, em không dám đối mặt với thực tế khắc nghiệt, hay thực ra em không dám đối diện với chính mình.</p>
-        <p><b>Nội dung: </b>  Em và anh, hai đứa quen nhau thật tình cờ. Lời hát của anh từ bài hát "Cây và gió" đã làm tâm hồn em xao động. Nhưng sự thật phũ phàng rằng em chưa bao giờ nói cho anh biết những suy nghĩ tận sâu trong tim mình. Bởi vì em nhút nhát, em không dám đối mặt với thực tế khắc nghiệt, hay thực ra em không dám đối diện với chính mình.</p>
-        <p><b>Tác giả: </b> Nguyễn Văn Giả</p>
-      </div>
-    </div>
-  </div>
-</div>
 <div class="card-footer">
     TLU'S MUSIC GARDEN
   </div>

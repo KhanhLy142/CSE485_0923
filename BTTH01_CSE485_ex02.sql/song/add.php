@@ -1,53 +1,3 @@
-<?php
-    //Dich vu Bao ve
-    session_start();
-
-    //Kiem tra thong tin để bảo vệ kiểm soát ra vào
-    if(!isset($_SESSION['Login'])){
-        header("Location:../../login.php");
-    }
-?>
-<?php
-// Nhận dữ liệu từ form khi gửi POST request
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Lấy và kiểm tra dữ liệu từ biểu mẫu
-    $ten_tloai = $_POST["ten_tloai"];
-
-    try {
-        $conn = new PDO('mysql:host=localhost;dbname=btth01_cse485', 'root', '');
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        // Truy vấn kiểm tra xem tên thể loại đã tồn tại hay chưa
-        $sql_check = "SELECT COUNT(*) FROM theloai WHERE ten_tloai = '$ten_tloai'";
-        $stmt_check = $conn->prepare($sql_check);
-        $stmt_check->execute();
-
-        $rowCount = $stmt_check->fetchColumn();
-
-        if ($rowCount > 0) {
-            $reponse = "Tên thể loại đã tồn tại";
-            header("Location: category.php?reponse=" . urlencode($reponse));
-            exit(); // Dừng thực hiện script sau khi chuyển hướng
-        } else {
-            // Thêm thể loại mới vào cơ sở dữ liệu
-            $sql_insert = "INSERT INTO theloai (ten_tloai) VALUES (:ten_tloai)";
-            $stmt_insert = $conn->prepare($sql_insert);
-            $stmt_insert->bindParam(":ten_tloai", $ten_tloai, PDO::PARAM_STR);
-            $stmt_insert->execute();
-
-            $rowCount = $stmt_insert->rowCount();
-
-            if ($rowCount > 0) {
-                $reponse = "Đã thêm thành công thể loại mới";
-                header("Location: category.php?reponse=" . urlencode($reponse));
-                exit();
-            }
-        }
-    } catch (PDOException $e) {
-        echo $e->getMessage();
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -94,13 +44,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <a class="nav-link" href="#">Trang ngoài</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Thể loại</a>
+          <a class="nav-link" href="#">Thể loại</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Tác giả</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Bài viết</a>
+          <a class="nav-link active" aria-current="page"  href="#">Bài viết</a>
         </li>
       </ul>
     </div>
@@ -108,13 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </nav>
 <div class="container">
 <b><h3>THÊM MỚI THỂ LOẠI</h3></b>
-<?php
-            if(isset($_GET['error'])){
-                echo "<p style='background-color:red'>{$_GET['error']}</p>";
-            }
-        ?>
- <form action="add_category.php" method="POST">
- <div class="input-group mb-3">
+<div class="input-group mb-3">
   <span class="input-group-text" id="inputGroup-sizing-default">Tên thể loại</span>
   <input type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
 </div>
@@ -123,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <button type="button" class="btn btn-warning">Quay lại</button>
 </div>
 </div>
- </form>
 <footer>
 <div class="card-footer">
     TLU'S MUSIC GARDEN
